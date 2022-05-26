@@ -3,10 +3,6 @@ import math
 from threading import Thread
 from random import randint as rr
 
-'''
-#label = myfont.render(str(score), 1, (255, 255, 255))
-#screen.blit(label, (10, 610+i*100))
-'''
 
 pygame.init()
 myfont = pygame.font.SysFont("Arial", 32)
