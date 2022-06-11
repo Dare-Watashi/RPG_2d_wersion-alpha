@@ -25,7 +25,7 @@ class Interaction:
                     else:
                         if 'action' in thing.keys():
                             if thing['action'] == self.change_map and p_f.pygame.key.get_pressed()[p_f.pygame.K_SPACE]:
-                                thing['action'](thing['args'])
+                                thing['action'](thing, thing['args'])
 
             '''*************** map change ***************'''
 
@@ -45,11 +45,16 @@ class Interaction:
             except:
                 pass
 
-    def change_map(self, nextmap):
+    def change_map(self, reasoner, nextmap):
         lastmap = p_f.actualmap
         p_f.actualmap = nextmap
 
-        player.body.x = maps[p_f.actualmap]["walkable"].position[0]\
-                        + maps[p_f.actualmap]["walkable"].size[0]/2
-        player.body.y = maps[p_f.actualmap]["walkable"].position[1]\
-                        + maps[p_f.actualmap]["walkable"].size[1]/2
+        walkable = tuple(self.mapchanges[p_f.actualmap].keys())\
+            [tuple(self.mapchanges[p_f.actualmap].values()).index(lastmap)]
+
+        player.body.x = maps[p_f.actualmap][walkable].position[0] + 10
+        player.body.y = maps[p_f.actualmap][walkable].position[1] + 20
+
+        drawing.todraw.remove(reasoner)
+
+        p_f.pygame.time.delay(1000)

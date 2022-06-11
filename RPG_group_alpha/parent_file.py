@@ -20,8 +20,8 @@ clock = pygame.time.Clock()
 tick = 25
 
 
-def mps(pixels, seconds):  # meters per second
-    return pixels / seconds / tick
+def mps(pixels, seconds=1):  # meters per second
+    return pixels * 25 / seconds / tick
 
 
 def sectoframes(sec):
@@ -31,16 +31,6 @@ def sectoframes(sec):
 class ThreadCenter:
     def __init__(self):
         self.threads = []
-
-        '''self.emergencythread = Thread(target=self.emergency, daemon=True)
-        self.emergencythread.start()
-
-        def emergency(self):
-        global running
-        while True:
-            if pygame.key.get_pressed()[pygame.K_ESCAPE]:
-                running = False
-                exit(0)'''
 
     def append(self, target, args=()):
         newthread = Thread(target=target, args=args)
@@ -53,6 +43,6 @@ threadCenter = ThreadCenter()
 
 
 '''*********** world part ***********'''
-actualmap = 1
+actualmap = 2
 mapcorners = {1: (400, 50, screenwidth-400, screenheight-50),
-              2: (25, 25, screenwidth-50, screenheight-50)}
+              2: (30, 30, screenwidth-50, screenheight-50)}

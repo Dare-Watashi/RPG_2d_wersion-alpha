@@ -8,6 +8,7 @@ interactionobject = Interaction()
 
 
 '''*************** main loop ***************'''
+fps = []
 
 while p_f.running:
     for ev in p_f.pygame.event.get():
@@ -16,5 +17,11 @@ while p_f.running:
 
     drawing.draw_screen()
 
-    p_f.clock.tick(p_f.tick)
     p_f.pygame.display.flip()
+    p_f.clock.tick(p_f.tick // 2)
+
+    '''if int(p_f.clock.get_fps()) not in fps:
+        fps.append(int(p_f.clock.get_fps()))
+
+print(max(fps))
+print(sorted(fps))'''
