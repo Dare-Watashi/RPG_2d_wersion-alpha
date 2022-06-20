@@ -1,11 +1,9 @@
-elementals = ['cryo', 'fire', 'hydro', 'nature']
-
-
 class Basic:
     def __init__(self):
         self.multipliers = {
             'life': 1,
             'health': 1,
+            'defense': 1,
             'movement speed': 1,
             'damage': 1,
             'attack speed': 1,
@@ -29,6 +27,7 @@ class Cryo:
         self.multipliers = {
             'life': 1,
             'health': 1,
+            'defense': 1.05,
             'movement speed': 0.9,
             'damage': 1,
             'attack speed': 0.9,
@@ -52,6 +51,7 @@ class Fire:
         self.multipliers = {
             'life': 0.9,
             'health': 0.9,
+            'defense': 0.95,
             'movement speed': 1,
             'damage': 1.1,
             'attack speed': 1.1,
@@ -70,11 +70,12 @@ class Fire:
         }
 
 
-class Hydro:
+class Aqua:
     def __init__(self):
         self.multipliers = {
             'life': 1.05,
             'health': 1.05,
+            'defense': 1,
             'movement speed': 1,
             'damage': 0.9,
             'attack speed': 0.9,
@@ -98,6 +99,7 @@ class Nature:
         self.multipliers = {
             'life': 1.1,
             'health': 1.1,
+            'defense': 1,
             'movement speed': 1,
             'damage': 0.9,
             'attack speed': 1,
@@ -114,3 +116,6 @@ class Nature:
             'nature': 0.1,
             'physical': 0
         }
+
+
+elements = {'basic': Basic(), 'cryo': Cryo(), 'fire': Fire(), 'aqua': Aqua(), 'nature': Nature()}

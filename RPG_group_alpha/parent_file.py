@@ -1,12 +1,14 @@
 import pygame
 import numpy
 from threading import Thread
+from random import randint
 import sys
 import winsound
 
 numpy = numpy
 pygame.init()
 talkfont = pygame.font.SysFont("Arial", 48)
+skillsfont = pygame.font.SysFont("Arial", 42)
 objectsfont = pygame.font.SysFont("Arial", 24)
 
 running = True
@@ -19,6 +21,8 @@ screenheight = screen.get_height()  # 900
 clock = pygame.time.Clock()
 tick = 25
 
+mousepressed = False
+
 
 def mps(pixels, seconds=1):  # meters per second
     return pixels * 25 / seconds / tick
@@ -30,13 +34,18 @@ def sectoframes(sec):
 
 class ThreadCenter:
     def __init__(self):
-        self.threads = []
+        self.threads = {}
 
-    def append(self, target, args=()):
-        newthread = Thread(target=target, args=args)
+    def append(self, target, args=(), name=''):
+        if not name:
+            name = str(target)
+        newthread = Thread(target=target, args=args, name=name)
         newthread.daemon = True
-        self.threads.append(newthread)
-        self.threads[-1].start()
+        self.threads[name] = newthread
+        self.threads[name].start()
+
+    def exists(self, name):
+        return name in self.threads.keys()
 
 
 threadCenter = ThreadCenter()
@@ -46,3 +55,7 @@ threadCenter = ThreadCenter()
 actualmap = 2
 mapcorners = {1: (400, 50, screenwidth-400, screenheight-50),
               2: (30, 30, screenwidth-50, screenheight-50)}
+
+'''*********** draw part ***********'''
+todraw = {'things': [],
+          'icons': {}}

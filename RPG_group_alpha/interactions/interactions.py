@@ -17,11 +17,11 @@ class Interaction:
         while p_f.running:
             '''*************** executing and removing objects to draw ***************'''
 
-            if drawing.todraw.__len__() > 0:
-                for thing in drawing.todraw:
+            if p_f.todraw['things'].__len__() > 0:
+                for thing in p_f.todraw['things']:
                     if not player.body.colliderect(maps[thing['map']][thing['parent']].body)\
                             or thing['map'] != p_f.actualmap:
-                        drawing.todraw.remove(thing)
+                        p_f.todraw['things'].remove(thing)
                     else:
                         if 'action' in thing.keys():
                             if thing['action'] == self.change_map and p_f.pygame.key.get_pressed()[p_f.pygame.K_SPACE]:
@@ -40,8 +40,8 @@ class Interaction:
                                       'color': p_f.pygame.Color(100, 100, 100, 150),
                                       'body': doorrect, 'text': 'door', 'action': self.change_map,
                                       'args': self.mapchanges[p_f.actualmap][interactiveobject]}
-                        if dictionary not in drawing.todraw:
-                            drawing.todraw.append(dictionary)
+                        if dictionary not in p_f.todraw['things']:
+                            p_f.todraw['things'].append(dictionary)
             except:
                 pass
 
@@ -55,6 +55,6 @@ class Interaction:
         player.body.x = maps[p_f.actualmap][walkable].position[0] + 10
         player.body.y = maps[p_f.actualmap][walkable].position[1] + 20
 
-        drawing.todraw.remove(reasoner)
+        p_f.todraw['things'].remove(reasoner)
 
         p_f.pygame.time.delay(1000)
