@@ -1,6 +1,6 @@
 from RPG_group_alpha import parent_file as p_f
 
-img = p_f.pygame.image.load(r'C:\Users\Patryk\PycharmProjects\RPGalpha\RPG_group_alpha\textures\player_weapons1-2.png')
+img = p_f.pygame.image.load(r'/home/patryk/PycharmProjects/RPG_2d_wersion-alpha/RPG_group_alpha/textures/player_weapons1-2.png')
 
 playeranimation = {
     'breathing': [p_f.pygame.transform.scale(img.subsurface(p_f.pygame.Rect(0*24, 0, 24, 24)), (100, 100)),

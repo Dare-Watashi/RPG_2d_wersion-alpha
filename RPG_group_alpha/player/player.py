@@ -2,7 +2,7 @@ from RPG_group_alpha import parent_file as p_f
 from RPG_group_alpha.world.world_maps import maps
 from RPG_group_alpha.player.elements_classes import elements
 from RPG_group_alpha.player import dict_of_attacks_and_skills as dict_of_skills
-from RPG_group_alpha.creatures.cretures_map import creaturesmap
+from RPG_group_alpha.player.menu import while_menu_opened
 
 
 class Player:
@@ -32,7 +32,7 @@ class Player:
         self.maxdamage = maxdamage
         self.damage = self.maxdamage * self.element.multipliers['damage']
         self.maxattackspeed = maxattackspeed  # 2 hits per second
-        self.attackspeed = self.maxattackspeed * self.element.multipliers['attack speed']
+        self.attackspeed = self.maxattackspeed * (1 + (1 - self.element.multipliers['attack speed']))
         self.levelingcriticalchance = maxcriticalchance
         self.maxcriticalchance = maxcriticalchance
         self.criticalchance = self.maxcriticalchance * self.element.multipliers['critical chance']
@@ -60,9 +60,18 @@ class Player:
         self.actualanimationflip = 0
 
         """ ********** fight ********* """
+        self.weaponrange = 50
+
+        self.normalattackcollisioner = p_f.pygame.Rect(
+            self.body.x if self.faceing[0] >= 0 else self.body.x - self.weaponrange,
+            self.body.y if self.faceing[1] >= 0 else self.body.y - self.weaponrange,
+            self.body.width if self.faceing[0] == 0 else self.body.width + self.weaponrange,
+            self.body.height if self.faceing[1] == 0 else self.body.height + self.weaponrange
+        )
+
         self.moveing = False
         self.attacking = False
-        self.normalattackcooldown = p_f.tick * 2
+        self.normalattackcooldown = p_f.tick * 2 * self.attackspeed
 
         self.skill1 = 'rush'
         self.skill1cooldown = 0
@@ -90,12 +99,17 @@ class Player:
         self.functionsthread = p_f.threadCenter.append(self.calling_functions, name='_player functions thread_')
 
     def calling_functions(self):
+        p_f.pygame.time.delay(1000)
         while p_f.running:
+            self.open_player_menu()
+
             self.move()
             self.attack()
             self.level_up()
 
             p_f.clock.tick(p_f.tick)
+
+        p_f.threadCenter.sleep()
 
     def update_characteristic(self):
         self.maxlife = int(self.level * self.levelinglife * (9 + self.rank) / 10)
@@ -174,18 +188,21 @@ class Player:
                 self.body.bottom = maps[p_f.actualmap]['walkable'].body.bottom
 
     def attack(self):
-
-        """def find_targets():
-            targets = []
-
-            # for creature in creaturesmap[p_f.actualmap]:"""
+        self.normalattackcollisioner = p_f.pygame.Rect(
+            self.body.x if self.faceing[0] >= 0 else self.body.x - self.weaponrange,
+            self.body.y if self.faceing[1] >= 0 else self.body.y - self.weaponrange,
+            self.body.width if self.faceing[0] == 0 else self.body.width + self.weaponrange,
+            self.body.height if self.faceing[1] == 0 else self.body.height + self.weaponrange)
 
         if self.normalattackcooldown <= 0 and not self.moveing:
             if p_f.mousepressed:
                 p_f.mousepressed = False
                 self.attacking = True
                 self.animation = 'attack'
-                self.normalattackcooldown = p_f.tick * 2
+
+                dict_of_skills.hurt_targets_in_range(self, self.damage, exceptors=[])
+
+                self.normalattackcooldown = p_f.tick * 2 * (1 + (1 - self.element.multipliers['attack speed']))
         else:
             self.normalattackcooldown -= 1
 
@@ -197,19 +214,20 @@ class Player:
             p_f.todraw['icons']['skill1-ability']['body'].height = 50 - self.skill1cooldown
             p_f.todraw['icons']['skill1-ability-number'] = (
             p_f.skillsfont.render(str(round(self.skill1cooldown/p_f.tick, 1)), 1, p_f.pygame.Color(0, 0, 0)),
-            (p_f.mapcorners[p_f.actualmap][2] - 150,
-             p_f.mapcorners[p_f.actualmap][3] - 48))
+            (p_f.screenwidth - 198,
+             p_f.screenheight - 96))
             if not self.skill1cooldown:
                 p_f.todraw['icons']['skill1-ability-number'] = (
                 p_f.skillsfont.render('1', 1, p_f.pygame.Color(33, 250, 180)),
-                (p_f.mapcorners[p_f.actualmap][2] - 136,
-                 p_f.mapcorners[p_f.actualmap][3] - 48))
+                (p_f.screenwidth - 186,
+                 p_f.screenheight - 96))
         else:
 
             if p_f.pygame.key.get_pressed()[p_f.pygame.K_1]:
                 dict_of_skills.execute(executor=self, activation=self.skill1active,
-                                       skilltype=self.skill1, skilllevel=self.level)
-                self.skill1cooldown = p_f.tick * dict_of_skills.maindict[self.fraction]['skill 1']['cooldown']
+                                       skilltype=self.skill1, skilllevel=self.level, skillnumber="skill 1")
+                self.skill1cooldown = p_f.tick * dict_of_skills.maindict[self.fraction]\
+                    ['skill 1']['cooldown'] * (1 + (1 - self.element.multipliers['attack speed']))
 
     def level_up(self):
         leveledup = True
@@ -232,15 +250,22 @@ class Player:
         if self.rank == 3:
             pass
 
+    def open_player_menu(self):
+        p_f.pygame.init()
+
+        if not p_f.playerisfighting and not p_f.talkingscene:
+            if p_f.pygame.key.get_pressed()[p_f.pygame.K_c]:
+                p_f.playersmenuopened = True
+                while_menu_opened()
+        elif p_f.playerisfighting:
+            if p_f.pygame.key.get_pressed()[p_f.pygame.K_c]:
+                p_f.todraw["icons"]["can't open the menu while fighting"] = [
+                    p_f.objectsfont.render(str("can't open the menu while fighting"), 1, p_f.pygame.Color('white')),
+                    (p_f.screenwidth//2-150, p_f.screenheight-200), p_f.tick*2]
+
 
 basicplayer = Player((400, 400), (60, 100), 'basic',
                      maxlife=100, maxhealth=100, maxdefense=0, maxdamage=10, maxattackspeed=2, maxcriticalchance=0,
                      maxcriticalmultiplier=1, maxspeed=200, fraction='basic')
 
 player = basicplayer
-
-'''p_f.todraw['things'].append({'body': p_f.pygame.Rect(player.body.x + player.faceing[0]*100 - 100,
-                                                             player.body.y + player.faceing[1]*100 - 100,
-                                                             player.body.width + abs(player.faceing[0])*player.body.width,
-                                                             player.body.height + abs(player.faceing[1])*player.body.height),
-                                     'color': p_f.pygame.Color(255, 255, 60)})'''

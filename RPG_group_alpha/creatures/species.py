@@ -13,6 +13,7 @@ class Creature:
         self.body = p_f.pygame.Rect(position, size)
         self.level = level
         self.life = life
+        self.dead = False
         self.speed = speed
         self.color = p_f.pygame.Color(color[0], color[1], color[2]),
         self.character = character
@@ -24,7 +25,7 @@ class Creature:
         self.target = None
 
     def move_to(self, gox, goy):
-        if not self.moveing and not self.fighting:
+        if not self.moveing and not self.fighting and not self.dead:
             self.destination = gox, goy
             self.moveing = True
 
@@ -64,6 +65,14 @@ class Creature:
                 self.body.y - self.speed / (p_f.clock.get_fps() + 0.01):
             self.moveing = False
 
+    def die(self):
+        if not self.dead:
+            if self.life <= 0:
+                self.body.x, self.body.y = -self.body.width, -self.body.height
+                self.dead = True
+                self.fighting = False
+                p_f.playerisfighting = False
+
 
 class Human(Creature):
     def __init__(self, position, level, color, character):
@@ -89,7 +98,7 @@ class Robber(Human):
         self.damage = 10 * self.level
 
     def update(self):
-        if not self.fighting:
+        if not self.fighting and not self.dead:
             self.move_to(
                 p_f.randint(int(world_maps.maps[p_f.actualmap]['walkable'].body.left+self.body.width/2),
                             int(world_maps.maps[p_f.actualmap]['walkable'].body.right-self.body.width*1.5)),
@@ -97,10 +106,13 @@ class Robber(Human):
                             int(world_maps.maps[p_f.actualmap]['walkable'].body.bottom - self.body.height*1.5))
                          )
         else:
-            if self.target is not None:
+            if self.target is not None and not self.dead:
                 self.move_to(self.target.body.x, self.target.body.y)
 
-        if target is not None:
+        if target is not None and not self.dead:
             if abs(self.body.x - target.body.x) < 300 and abs(self.body.y - target.body.y) < 300:
                 self.target = target
                 self.fighting = True
+                p_f.playerisfighting = True
+
+        self.die()

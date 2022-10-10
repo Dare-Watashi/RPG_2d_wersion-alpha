@@ -45,6 +45,8 @@ class Interaction:
             except:
                 pass
 
+            p_f.threadCenter.sleep()
+
     def change_map(self, reasoner, nextmap):
         lastmap = p_f.actualmap
         p_f.actualmap = nextmap

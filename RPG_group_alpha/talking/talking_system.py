@@ -6,6 +6,7 @@ from RPG_group_alpha import parent_file as p_f
 
 
 def talk_scene(dialogue):
+    p_f.talkingscene = True
     for speaker, text in dialogue:
         p_f.screen.fill((0, 0, 0))
         p_f.pygame.draw.rect(p_f.screen, (120, 120, 120),
@@ -35,3 +36,5 @@ def talk_scene(dialogue):
                     exit(0)
             if p_f.pygame.key.get_pressed()[p_f.pygame.K_SPACE]:
                 break
+
+    p_f.talkingscene = False

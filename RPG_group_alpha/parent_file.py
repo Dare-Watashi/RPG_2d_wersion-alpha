@@ -3,12 +3,11 @@ import numpy
 from threading import Thread
 from random import randint
 import sys
-import winsound
 
 numpy = numpy
 pygame.init()
 talkfont = pygame.font.SysFont("Arial", 48)
-skillsfont = pygame.font.SysFont("Arial", 42)
+skillsfont = pygame.font.SysFont("Arial", 36)
 objectsfont = pygame.font.SysFont("Arial", 24)
 
 running = True
@@ -47,6 +46,12 @@ class ThreadCenter:
     def exists(self, name):
         return name in self.threads.keys()
 
+    def sleep(self):
+        global playersmenuopened, running
+        while playersmenuopened:
+            if not running:
+                break
+
 
 threadCenter = ThreadCenter()
 
@@ -56,6 +61,17 @@ actualmap = 2
 mapcorners = {1: (400, 50, screenwidth-400, screenheight-50),
               2: (30, 30, screenwidth-50, screenheight-50)}
 
+'''*********** player part ***********'''
+talkingscene = False
+
 '''*********** draw part ***********'''
 todraw = {'things': [],
           'icons': {}}
+
+'''*********** player part ***********'''
+playersmenuopened = False
+playerisfighting = False
+
+'''*********** creatures part ***********'''
+creaturesmap = {1: [],
+                2: []}

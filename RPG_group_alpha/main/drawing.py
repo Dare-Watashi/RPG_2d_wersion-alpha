@@ -2,7 +2,6 @@ from RPG_group_alpha import parent_file as p_f
 from RPG_group_alpha.world.world import draw_map
 from RPG_group_alpha.player.player import player
 from RPG_group_alpha.textures import division_and_organisation as dao
-from RPG_group_alpha.creatures.cretures_map import creaturesmap
 
 
 def draw_screen():
@@ -15,7 +14,7 @@ def draw_screen():
             p_f.screen.blit(p_f.objectsfont.render(thing['text'], 1, (255, 255, 255, 255)),
                             (thing['body'].x + 1, thing['body'].y + 1))
 
-    for creature in creaturesmap[p_f.actualmap]:
+    for creature in p_f.creaturesmap[p_f.actualmap]:
         p_f.pygame.draw.rect(p_f.screen, creature.color, creature.body)
 
     for icon in p_f.todraw['icons'].values():
@@ -23,6 +22,13 @@ def draw_screen():
             p_f.pygame.draw.rect(p_f.screen, icon['color'], icon['body'])
         else:
             p_f.screen.blit(icon[0], icon[1])
+            if len(icon) > 2:
+                if icon[2] > 0:
+                    icon[2] -= 1
+                else:
+                    p_f.todraw["icons"].__delitem__(list(p_f.todraw["icons"].keys())[list(p_f.todraw["icons"].values()).
+                                                    index(icon)])
+                    break
 
     def player_animation(type):
         p_f.screen.blit(dao.playeranimation[type][player.actualanimationflip], (player.body.x-20, player.body.y))
@@ -42,6 +48,7 @@ def update_animations_flips():
                 player.actualanimationflip = 0
 
         p_f.clock.tick(p_f.tick)
+        p_f.threadCenter.sleep()
 
 
 p_f.threadCenter.append(update_animations_flips)
